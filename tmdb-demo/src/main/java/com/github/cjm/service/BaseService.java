@@ -6,11 +6,12 @@
 package com.github.cjm.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.cjm.resource.ResourceCollection;
-import com.github.cjm.resource.TvShowCollection;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -18,34 +19,55 @@ import org.springframework.web.client.RestTemplate;
  * @author moscac
  * @param <T>
  */
-public class BaseService<T> {
+public class BaseService<T extends ResourceCollection> {
 
     protected final String MOVIEDB_URL = "http://api.themoviedb.org/3";
     protected final String apiKey;
+    private final int MAX_PAGES = 100;
 
     public BaseService() {
         apiKey = System.getenv("MOVIEDB_API_KEY");
     }
 
-    public TvShowCollection load(String resource) {
+    public ResourceCollection load(String resource, Class clazz, int page) {
 
         StringBuilder uri = new StringBuilder(MOVIEDB_URL);
         uri.append(resource);
         uri.append("?api_key=").append(apiKey);
-
-        RestTemplate restTemplate = new RestTemplate();
-        //ResourceCollection<T> resourceCollection = restTemplate.getForObject(uri.toString(), ResourceCollection.class);
-        String data = restTemplate.getForObject(uri.toString(), String.class);
-        ObjectMapper mapper = new ObjectMapper();
-        TvShowCollection resourceCollection = null;
-        //TypeFactory t = TypeFactory.defaultInstance();
-        try {
-            resourceCollection = mapper.readValue(data,  TvShowCollection.class);
-        } catch (IOException ex) {
-            Logger.getLogger(BaseService.class.getName()).log(Level.SEVERE, null, ex);
+        if (page > 1) {
+            uri.append("&page=").append(page);
         }
 
+        RestTemplate restTemplate = new RestTemplate();
+        ResourceCollection<T> resourceCollection = new ResourceCollection<>();
+        String data = null;
+        try {
+            data = restTemplate.getForObject(uri.toString(), String.class);
+        } catch (HttpClientErrorException e) {
+
+        }
+        if (data != null) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                TypeFactory t = TypeFactory.defaultInstance();
+                resourceCollection = mapper.readValue(data, t.constructType(clazz));
+            } catch (IOException ex) {
+                Logger.getLogger(BaseService.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         return resourceCollection;
     }
 
+    public ResourceCollection loadAll(String resource, Class clazz) {
+        ResourceCollection<T> resourceCollection = new ResourceCollection<>();
+        int page = 1;
+        while (true) {
+            ResourceCollection r = load(resource, clazz, page++);
+            resourceCollection.getResults().addAll(r.getResults());
+            if (page >= MAX_PAGES || resourceCollection.getResults().isEmpty()) {
+                break;
+            }
+        }
+        return resourceCollection;
+    }
 }

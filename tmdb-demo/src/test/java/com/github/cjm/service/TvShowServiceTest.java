@@ -5,6 +5,7 @@
  */
 package com.github.cjm.service;
 
+import com.github.cjm.resource.ResourceCollection;
 import com.github.cjm.resource.TvShow;
 import com.github.cjm.resource.TvShowCollection;
 import org.junit.After;
@@ -42,11 +43,11 @@ public class TvShowServiceTest {
     @Test
     public void testLoad() {
         TvShowService instance = new TvShowService();
-        TvShowCollection result = instance.load(TvShowService.RESOURCE_TV_POPULAR);
+        ResourceCollection result = instance.load(TvShowService.RESOURCE_TV_POPULAR, TvShowCollection.class, 0);
         Assert.assertNotNull(result);
-        for (TvShow tvShow : result.getResults()) {
-            System.out.println(tvShow.getName());
-        }
+//        for (TvShow tvShow : result.getResults()) {
+//            System.out.println(tvShow.getName());
+//        }
     }
     
 }

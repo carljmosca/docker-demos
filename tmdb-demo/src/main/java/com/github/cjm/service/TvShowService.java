@@ -5,13 +5,15 @@
  */
 package com.github.cjm.service;
 
-import com.github.cjm.resource.TvShow;
+import com.github.cjm.resource.TvShowCollection;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author moscac
  */
-public class TvShowService extends BaseService<TvShow> {
+@Service
+public class TvShowService extends BaseService<TvShowCollection> {
 
     public static String RESOURCE_TV_POPULAR = "/tv/popular";
     

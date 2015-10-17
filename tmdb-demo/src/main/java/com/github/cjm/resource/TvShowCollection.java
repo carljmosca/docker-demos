@@ -5,30 +5,11 @@
  */
 package com.github.cjm.resource;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import java.io.Serializable;
-import java.util.List;
-import javax.xml.bind.annotation.XmlRootElement;
-import lombok.Data;
-
 /**
  *
  * @author moscac
  */
-@Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@XmlRootElement
-public class TvShowCollection implements Serializable {
+public class TvShowCollection extends ResourceCollection<TvShow> {
     
-    @JsonProperty("page")
-    private int page;
-    @JsonProperty("results")
-    private List<TvShow> results;
-    
-    public TvShowCollection() {
-        //results = new ArrayList<>();
-    }    
+ 
 }

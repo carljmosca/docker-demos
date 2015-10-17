@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import javax.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
@@ -30,6 +31,6 @@ public class ResourceCollection<T> implements Serializable {
     private Collection<T> results;
     
     public ResourceCollection() {
-        //results = new ArrayList<>();
+        results = new ArrayList<>();
     }
 }
