@@ -1,0 +1,5 @@
+com/github/cjm/resource/TvShow.class
+com/github/cjm/service/TvShowService.class
+com/github/cjm/resource/ResourceCollection.class
+com/github/cjm/service/BaseService.class
+com/github/cjm/resource/TvShowCollection.class
