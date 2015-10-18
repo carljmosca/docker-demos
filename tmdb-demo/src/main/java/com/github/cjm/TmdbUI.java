@@ -39,7 +39,8 @@ public class TmdbUI extends UI {
     private final HorizontalLayout buttonLayout;
     private final VerticalLayout userGridLayout;
     private final HorizontalLayout movieGridLayout;
-    private Button btnRefresh;
+    private Button btnAddUser;
+    private Button btnAddFavorite;
     private TextField username;
     private Grid userGrid;
     private Grid movieGrid;
@@ -57,11 +58,8 @@ public class TmdbUI extends UI {
     protected void init(VaadinRequest vaadinRequest) {
 
         mainLayout.setSpacing(true);
-        buttonLayout.setSpacing(true);
-        btnRefresh = new Button("Refresh");
-        buttonLayout.addComponent(btnRefresh);
-        mainLayout.addComponent(buttonLayout);
 
+        addButtons();
         addUserGrid();
         addMovieGrid();
         
@@ -69,6 +67,15 @@ public class TmdbUI extends UI {
         mainLayout.setExpandRatio(movieGridLayout, 2);
 
         setContent(mainLayout);
+    }
+    
+    private void addButtons() {
+        buttonLayout.setSpacing(true);
+        btnAddUser = new Button("Add User");
+        btnAddFavorite = new Button("Add Favorite");
+        buttonLayout.addComponent(btnAddUser);
+        buttonLayout.addComponent(btnAddFavorite);
+        mainLayout.addComponent(buttonLayout);        
     }
     
     private void addUserGrid() {
