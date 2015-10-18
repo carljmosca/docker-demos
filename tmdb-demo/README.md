@@ -2,7 +2,7 @@ themoviedb demo program
 =======================
 
 This program was designed to illustrate some basic Docker functionality.  The
-program was written in Java and utilizes Spring Boot and [Vaadin](https://vaadin.com/home)technologies.  It
+program was written in Java and utilizes [Spring Boot] (http://projects.spring.io/spring-boot/) and [Vaadin](https://vaadin.com/home) technologies.  It
 includes a MySQL database and utilizes the Movie Database API.
 
 In order to access the Movie Database API (REST service), an environment variable,
