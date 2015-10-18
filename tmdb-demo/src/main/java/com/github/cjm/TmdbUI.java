@@ -64,6 +64,9 @@ public class TmdbUI extends UI {
 
         addUserGrid();
         addMovieGrid();
+        
+        mainLayout.setExpandRatio(userGridLayout, 1);
+        mainLayout.setExpandRatio(movieGridLayout, 2);
 
         setContent(mainLayout);
     }
@@ -71,20 +74,28 @@ public class TmdbUI extends UI {
     private void addUserGrid() {
         userGridLayout.setSpacing(true);
         userGridLayout.setWidth("100%");
-        userGridLayout.setHeight("25%");
+        userGridLayout.setHeight("230px");
         HorizontalLayout gridLayout = new HorizontalLayout();
+        gridLayout.setWidth("100%");
         HorizontalLayout fieldLayout = new HorizontalLayout();
         userGrid = new Grid();
-        userGrid.setSizeFull();
+        userGrid.setWidth("100%");
+        userGrid.setColumns("username");
+        userGrid.appendHeaderRow();
         gridLayout.addComponent(userGrid);
         username = new TextField();
+        username.setInputPrompt("username");
         fieldLayout.addComponent(username);
+        // NOTE: We are not using JPAContainer which would probably be a bit nicer here; 
+        // not yet had time to look at/work out Spring Boot compatibility.
         users = new BeanItemContainer<>(User.class);
         for (User user : userDao.findAll()) {
             users.addBean(user);
         }
-        userGridLayout.addComponent(gridLayout);        
         userGridLayout.addComponent(fieldLayout);
+        userGridLayout.addComponent(gridLayout);  
+        userGridLayout.setExpandRatio(fieldLayout, 1);
+        userGridLayout.setExpandRatio(gridLayout, 3);
         mainLayout.addComponent(userGridLayout);
     }
 
