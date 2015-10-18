@@ -5,6 +5,7 @@
  */
 package com.github.cjm;
 
+import com.github.cjm.util.EnvironmentManager;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
@@ -13,13 +14,14 @@ import org.springframework.context.annotation.ComponentScan;
  *
  * @author moscac
  */
-
 @EnableAutoConfiguration
 @ComponentScan
 public class TmdbApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TmdbApplication.class, args);
+        if (EnvironmentManager.checkEnvironment()) {
+            SpringApplication.run(TmdbApplication.class, args);
+        }
     }
 
 }

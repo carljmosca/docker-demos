@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.github.cjm.resource.ResourceCollection;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,6 +24,7 @@ public class BaseService<T extends ResourceCollection> {
     protected final String MOVIEDB_URL = "http://api.themoviedb.org/3";
     protected final String apiKey;
     private final int MAX_PAGES = 10;
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public BaseService() {
         apiKey = System.getenv("MOVIEDB_API_KEY");
@@ -44,7 +45,7 @@ public class BaseService<T extends ResourceCollection> {
         try {
             data = restTemplate.getForObject(uri.toString(), String.class);
         } catch (HttpClientErrorException e) {
-
+            log.warn(e.getMessage());
         }
         if (data != null) {
             ObjectMapper mapper = new ObjectMapper();
@@ -52,7 +53,7 @@ public class BaseService<T extends ResourceCollection> {
                 TypeFactory t = TypeFactory.defaultInstance();
                 resourceCollection = mapper.readValue(data, t.constructType(clazz));
             } catch (IOException ex) {
-                Logger.getLogger(BaseService.class.getName()).log(Level.SEVERE, null, ex);
+                log.error("ObjectMapper exception: ", ex);
             }
         }
         return resourceCollection;
