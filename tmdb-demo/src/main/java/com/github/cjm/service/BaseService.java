@@ -23,7 +23,7 @@ public class BaseService<T extends ResourceCollection> {
 
     protected final String MOVIEDB_URL = "http://api.themoviedb.org/3";
     protected final String apiKey;
-    private final int MAX_PAGES = 100;
+    private final int MAX_PAGES = 10;
 
     public BaseService() {
         apiKey = System.getenv("MOVIEDB_API_KEY");
