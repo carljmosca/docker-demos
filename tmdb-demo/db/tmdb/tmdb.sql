@@ -1,4 +1,4 @@
-  -- MySQL dump 10.13  Distrib 5.6.26, for osx10.8 (x86_64)
+-- MySQL dump 10.13  Distrib 5.6.26, for osx10.8 (x86_64)
 --
 -- Host: localhost    Database: tmdb
 -- ------------------------------------------------------
@@ -16,31 +16,29 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `MyGuests`
+-- Table structure for table `user`
 --
 
 CREATE DATABASE tmdb;
 CONNECT tmdb;
-DROP TABLE IF EXISTS `MyGuests`;
+DROP TABLE IF EXISTS `user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `MyGuests` (
-  `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
-  `firstname` varchar(30) NOT NULL,
-  `lastname` varchar(30) NOT NULL,
-  `email` varchar(50) DEFAULT NULL,
-  `reg_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+CREATE TABLE `user` (
+  `id` binary(16) NOT NULL,
+  `favorite_tv_shows` tinyblob,
+  `username` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `MyGuests`
+-- Dumping data for table `user`
 --
 
-LOCK TABLES `MyGuests` WRITE;
-/*!40000 ALTER TABLE `MyGuests` DISABLE KEYS */;
-/*!40000 ALTER TABLE `MyGuests` ENABLE KEYS */;
+LOCK TABLES `user` WRITE;
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -52,4 +50,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-10-30 17:05:43
+-- Dump completed on 2015-10-31 10:28:15
