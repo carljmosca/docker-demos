@@ -11,17 +11,24 @@ import com.github.cjm.resource.TvShow;
 import com.github.cjm.resource.TvShowCollection;
 import com.github.cjm.service.TvShowService;
 import com.vaadin.annotations.Theme;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
-import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.renderers.DateRenderer;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -39,94 +46,103 @@ public class TmdbUI extends UI {
 
     private final VerticalLayout mainLayout;
     private final HorizontalLayout buttonLayout;
-    private final VerticalLayout userGridLayout;
-    private final HorizontalLayout movieGridLayout;
-    private Button btnAddUser;
-    private Button btnAddFavorite;
-    private TextField username;
-    private Grid userGrid;
-    private Grid movieGrid;
+    private final HorizontalLayout userSectionLayout;
+    private final HorizontalLayout tvShowGridLayout;
+    private ComboBox username;
+    private ListSelect userFavorites;
+    private Grid tvShowGrid;
     private BeanItemContainer<User> users;
     private BeanItemContainer<TvShow> tvShows;
+    private BeanItemContainer<TvShow> favorites;
 
     public TmdbUI() {
         mainLayout = new VerticalLayout();
         buttonLayout = new HorizontalLayout();
-        userGridLayout = new VerticalLayout();
-        movieGridLayout = new HorizontalLayout();
+        userSectionLayout = new HorizontalLayout();
+        tvShowGridLayout = new HorizontalLayout();
     }
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
 
         mainLayout.setSpacing(true);
-
         addButtons();
         addUserGrid();
-        addMovieGrid();
-
-        mainLayout.setExpandRatio(userGridLayout, 1);
-        mainLayout.setExpandRatio(movieGridLayout, 2);
-
+        addTvShowGrid();
+        mainLayout.setExpandRatio(tvShowGridLayout, 2);
         setContent(mainLayout);
     }
 
     private void addButtons() {
         buttonLayout.setSpacing(true);
-        btnAddUser = new Button("Add User");
-        btnAddFavorite = new Button("Add Favorite");
-        buttonLayout.addComponent(btnAddUser);
-        buttonLayout.addComponent(btnAddFavorite);
         mainLayout.addComponent(buttonLayout);
     }
 
     private void addUserGrid() {
-        userGridLayout.setSpacing(true);
-        userGridLayout.setWidth("100%");
-        userGridLayout.setHeight("230px");
-        HorizontalLayout gridLayout = new HorizontalLayout();
-        gridLayout.setWidth("100%");
-        HorizontalLayout fieldLayout = new HorizontalLayout();
-        userGrid = new Grid();
-        userGrid.setWidth("100%");
-        userGrid.setColumns("username");
-        userGrid.appendHeaderRow();
-        gridLayout.addComponent(userGrid);
-        username = new TextField();
-        username.setInputPrompt("username");
-        fieldLayout.addComponent(username);
-        // NOTE: We are not using JPAContainer which would probably be a bit nicer here; 
-        // not yet had time to look at/work out Spring Boot compatibility.
+        userSectionLayout.setSpacing(true);
+        userSectionLayout.setWidth("100%");
+        username = new ComboBox();
+        username.setInputPrompt("name");
+        username.setNewItemsAllowed(true);
+        username.setTextInputAllowed(true);
+        username.addValueChangeListener((Property.ValueChangeEvent event) -> {
+            userFavorites.removeAllItems();
+            if (username.getValue() != null) {
+                User u = (User) username.getValue();
+                if (u.getFavoriteTvShows() != null) {
+                    for (Integer id : u.getFavoriteTvShows()) {
+                        userFavorites.addItem(getTvShow(id));
+                    }
+                }
+            }
+        });
+        username.setNewItemHandler((String newItemCaption) -> {
+            if (newItemCaption != null) {
+                User u = findUser(newItemCaption);
+                users.addBean(u);
+                username.setValue(u);
+            }
+        });
         users = new BeanItemContainer<>(User.class);
         for (User user : userDao.findAll()) {
             users.addBean(user);
         }
-        userGridLayout.addComponent(fieldLayout);
-        userGridLayout.addComponent(gridLayout);
-        userGridLayout.setExpandRatio(fieldLayout, 1);
-        userGridLayout.setExpandRatio(gridLayout, 3);
-        mainLayout.addComponent(userGridLayout);
+        username.setContainerDataSource(users);
+        username.setImmediate(true);
+        username.setItemCaptionPropertyId("username");
+        userSectionLayout.addComponent(username);
+        userFavorites = new ListSelect("Favorites");
+        userFavorites.setWidth("70%");
+        favorites = new BeanItemContainer<>(TvShow.class);
+        userFavorites.setContainerDataSource(favorites);
+        userFavorites.setItemCaptionPropertyId("name");
+        userSectionLayout.addComponent(userFavorites);
+        userSectionLayout.setExpandRatio(username, 1.0f);
+        userSectionLayout.setExpandRatio(userFavorites, 2.0f);
+        mainLayout.addComponent(userSectionLayout);
+
     }
 
-    private void addMovieGrid() {
+    private void addTvShowGrid() {
 
-        movieGridLayout.setSpacing(true);
-        movieGridLayout.setWidth("100%");
-        movieGrid = new Grid();
-        movieGrid.setSizeFull();
+        tvShowGridLayout.setSpacing(true);
+        tvShowGridLayout.setWidth("100%");
+        tvShowGrid = new Grid();
+        tvShowGrid.setSizeFull();
         tvShows = new BeanItemContainer<>(TvShow.class);
-        movieGrid.setColumns("name", "popularity", "voteAverage", "firstAirDate");
-        movieGrid.setHeaderVisible(true);
-        movieGrid.setContainerDataSource(tvShows);
-        HeaderRow filterRow = movieGrid.appendHeaderRow();
-        // Not really loading "all"; multiple pages up to some reasonable/polite limit (API is throttled and this is a demo afterall).
+        tvShowGrid.setColumns("name", "popularity", "voteAverage", "firstAirDate");
+        tvShowGrid.setHeaderVisible(true);
+        tvShowGrid.setContainerDataSource(tvShows);
+        HeaderRow filterRow = tvShowGrid.appendHeaderRow();
+        // Not really loading "all"; multiple pages up to some reasonable/polite limit 
+        // (API is throttled and this is a demo afterall).
         tvShows.addAll(tvShowService.loadAll(TvShowService.RESOURCE_TV_POPULAR, TvShowCollection.class).getResults());
-        movieGridLayout.addComponent(movieGrid);
-        mainLayout.addComponent(movieGridLayout);
+        tvShowGridLayout.addComponent(tvShowGrid);
+        mainLayout.addComponent(tvShowGridLayout);
 
-        movieGrid.getContainerDataSource()
+        tvShowGrid.getContainerDataSource()
                 .getContainerPropertyIds().stream().forEach((pid) -> {
-                    if (movieGrid.getColumn(pid) != null) {
+                    if (tvShowGrid.getColumn(pid) != null) {
                         Grid.HeaderCell cell = filterRow.getCell(pid);
 
                         TextField filterField = new TextField();
@@ -148,5 +164,65 @@ public class TmdbUI extends UI {
                     }
                 });
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        DateRenderer dateRenderer = new DateRenderer(dateFormat);
+        tvShowGrid.getColumn("firstAirDate").setRenderer(dateRenderer);
+
+        tvShowGrid.addItemClickListener((ItemClickEvent event) -> {
+            if (event.isDoubleClick()) {
+                User u = (User) username.getValue();
+                if (u != null) {
+                    users.removeItem(u);
+                    TvShow tvShow = getSelectedTvShow();
+                    if (tvShow != null) {
+                        favorites.addBean(tvShow);
+                        List<Integer> i = new ArrayList<>();
+                        favorites.getItemIds().stream().forEach((t) -> {
+                            i.add(t.getId());
+                        });
+                        u.setFavoriteTvShows(new Integer[i.size()]);
+                        u.setFavoriteTvShows(i.toArray(u.getFavoriteTvShows()));
+                        userDao.save(u);
+                        users.addBean(u);
+                    }
+                }
+            }
+        });
+
+    }
+
+    private TvShow getSelectedTvShow() {
+        Object selected;
+        if (tvShowGrid.getSelectedRows().isEmpty()) {
+            return null;
+        } else {
+            selected = tvShowGrid.getSelectedRows().toArray()[0];
+        }
+        TvShow tvShow = null;
+        if (selected != null) {
+            tvShow = tvShows.getItem(selected).getBean();
+        }
+        return tvShow;
+    }
+
+    private TvShow getTvShow(int id) {
+        for (TvShow t : tvShows.getItemIds()) {
+            if (t.getId().equals(id)) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    private User findUser(String username) {
+        List<User> userList = userDao.findByUsername(username);
+        if (userList != null && !userList.isEmpty()) {
+            return userList.get(0);
+        } else {
+            User u = new User();
+            u.setUsername(username);
+            userDao.save(u);
+            return u;
+        }
     }
 }

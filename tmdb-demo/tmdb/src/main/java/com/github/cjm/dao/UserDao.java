@@ -6,6 +6,7 @@
 package com.github.cjm.dao;
 
 import com.github.cjm.entity.User;
+import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
 import org.springframework.data.repository.CrudRepository;
@@ -17,4 +18,6 @@ import org.springframework.data.repository.CrudRepository;
 @Transactional
 public interface UserDao extends CrudRepository<User, UUID> {
 
+    List<User> findByUsername(String username);
+    
 }

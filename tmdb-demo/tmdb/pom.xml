@@ -21,15 +21,9 @@
         <repository>
             <id>vaadin-addons</id>
             <url>http://maven.vaadin.com/vaadin-addons</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
         </repository>
     </repositories>
-
+    
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -133,9 +127,9 @@
     <profiles>
         <profile>
             <id>default</id>
-            <activation>
+<!--            <activation>
                 <activeByDefault>true</activeByDefault>
-            </activation>
+            </activation>-->
             <build>
                 <plugins>
                     <plugin>
@@ -201,6 +195,9 @@
 
         <profile>
             <id>deploy</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
@@ -282,7 +279,7 @@
                     <plugin>
                         <groupId>com.spotify</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.3.3</version>
+                        <version>0.3.5</version>
                         <configuration>
                             <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
                             <dockerDirectory>src/main/docker</dockerDirectory>

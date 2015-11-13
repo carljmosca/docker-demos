@@ -1,1 +1,1 @@
-docker build  -t mysql/tmdb .
+docker build  -t carljmosca/tmdb-db .
