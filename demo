@@ -1,0 +1,11 @@
+
+
+oc create -f https://raw.githubusercontent.com/jorgemoralespou/osev3-examples/master/spring-boot/springboot-sti/springboot-sti-all.json
+
+oc create -f https://raw.githubusercontent.com/jorgemoralespou/osev3-examples/master/spring-boot/springboot-sti/springboot-sti-all.json -n test2
+
+oc create -f springbootdb-sti-all.json -n test2
+
+vagrant ssh -- -L 9999:172.30.7.147:8080
+
+oc logs helloworld-mvn-1-zqsns
